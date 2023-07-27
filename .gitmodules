@@ -1,0 +1,3 @@
+[submodule "open-LIN-c"]
+	path = open-LIN-c
+	url = git@github.com:CW-B-W/open-LIN-c.git
