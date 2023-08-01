@@ -1,3 +1,6 @@
 [submodule "open-LIN-c"]
-	path = open-LIN-c
+	path = src/open-LIN-c
 	url = git@github.com:CW-B-W/open-LIN-c.git
+[submodule "src/ESP32-SoftwareLIN"]
+	path = src/ESP32-SoftwareLIN
+	url = git@github.com:CW-B-W/ESP32-SoftwareLIN.git
