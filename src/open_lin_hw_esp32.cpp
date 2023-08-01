@@ -1,5 +1,4 @@
 #include "ESP32-SoftwareLIN/src/SoftwareLin.h"
-
 extern SoftwareLin swLin;
 
 #ifdef __cplusplus
@@ -9,7 +8,9 @@ extern "C" {
 #include "open_lin_types.h"
 #include "open_lin_transport_layer.h"
 
+#ifdef OPEN_LIN_TRANSPORT_LAYER
 open_lin_NAD_t open_lin_NAD;
+#endif
 l_u16 open_lin_function_id;
 l_u16 open_lin_supplier_id;
 
@@ -18,9 +19,16 @@ void open_lin_error_handler(t_open_lin_error error_code)
 
 }
 
+l_bool open_lin_hw_break_reg = false;
 l_bool open_lin_hw_check_for_break(void)
 {
-    return swLin.checkBreak();
+    if (open_lin_hw_break_reg) {
+        open_lin_hw_break_reg = false;
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 
 l_bool open_lin_hw_tx_break(void)
