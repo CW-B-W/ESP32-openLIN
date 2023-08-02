@@ -5,7 +5,6 @@ FILE(GLOB app_sources ${CMAKE_SOURCE_DIR}/src/*.*)
 FILE(GLOB open_lin_c_sources ${CMAKE_SOURCE_DIR}/src/open-LIN-c/*.*)
 FILE(GLOB espsoftwareserial_sources ${CMAKE_SOURCE_DIR}/src/ESP32-SoftwareLIN/src/espsoftwareserial/src/*.*)
 FILE(GLOB esp32_softwarelin_sources ${CMAKE_SOURCE_DIR}/src/ESP32-SoftwareLIN/src/*.*)
-list(REMOVE_ITEM esp32_softwarelin_sources ${CMAKE_SOURCE_DIR}/src/ESP32-SoftwareLIN/src/test.cpp)
 
 idf_component_register(
         SRCS 
