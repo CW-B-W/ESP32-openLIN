@@ -6,8 +6,8 @@ extern "C" {
 #include "open-LIN-c/open_lin_slave_data_layer.h"
 }
 
-#define RX_PIN (16)
-#define TX_PIN (17)
+#define RX_PIN (4)
+#define TX_PIN (5)
 
 SoftwareLin swLin(RX_PIN, TX_PIN);
 extern l_bool open_lin_hw_break_reg;
@@ -82,12 +82,19 @@ extern "C" void app_main()
 
         if (master_state == OPEN_LIN_MASTER_DATA_RX) {
             uint8_t buf[8];
-            while (swLin.available() <= 0)
+            
+            const unsigned long timeout_us = 100000; // 100ms timeout
+            unsigned long start_micro = micros();
+            while (swLin.available() <= 0 && (micros() - start_micro) < timeout_us) // 100ms timeout
                 ;
             int bytes_read = swLin.read(buf, sizeof(buf));
 
             for (int i = 0; i < bytes_read; ++i) {
                 open_lin_master_dl_rx(buf[i]);
+            }
+
+            if (bytes_read <= 0) {
+                Serial.printf("Master read timeout\n");
             }
         }
 
@@ -123,12 +130,19 @@ extern "C" void app_main()
 
             uint8_t buf[3 + 8];
             while (slave_state != OPEN_LIN_SLAVE_IDLE) {
-                while (swLin.available() <= 0)
+                const unsigned long timeout_us = 100000; // 100ms timeout
+                unsigned long start_micro = micros();
+                while (swLin.available() <= 0 && (micros() - start_micro) < timeout_us)
                     ;
                 int bytes_read = swLin.read(buf, sizeof(buf));
 
                 for (int i = 0; i < bytes_read; ++i) {
                     open_lin_slave_rx_header(buf[i]);
+                }
+
+                if (bytes_read <= 0) {
+                    open_lin_slave_reset();
+                    Serial.printf("Slave read timeout, resetting slave\n");
                 }
             }
 
