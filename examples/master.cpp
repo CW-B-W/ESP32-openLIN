@@ -18,6 +18,7 @@ void open_lin_master_state_callback(t_open_lin_master_state new_state)
     master_state_prev = master_state;
     master_state = new_state;
     if (new_state == OPEN_LIN_MASTER_IDLE) {
+        swLin.flush(); // to ensure every bytes are sent.
         swLin.endFrame();
     }
 
@@ -82,7 +83,7 @@ extern "C" {
 
 void open_lin_master_dl_rx_callback(open_lin_frame_slot_t* slot)
 {
-    Serial.printf("[open_lin_master_dl_rx_callback]\n\t");
+    Serial.printf("[open_lin_master_dl_rx_callback] PID=%d\n\t", (int)slot->pid);
     for (int i = 0; i < slot->data_length; ++i) {
         Serial.printf("0x%02X ", slot->data_ptr[i]);
     }
@@ -92,6 +93,63 @@ void open_lin_master_dl_rx_callback(open_lin_frame_slot_t* slot)
 void open_lin_error_handler(t_open_lin_error error_code)
 {
     Serial.printf("[open_lin_error_handler] error_code = %d\n", (int)error_code);
+
+    switch (error_code) {
+        case OPEN_LIN_NO_ERROR:
+            Serial.printf("\t%s\n", "OPEN_LIN_NO_ERROR");
+            break;
+
+        case OPEN_LIN_SLAVE_ERROR_INVALID_DATA_RX:
+            Serial.printf("\t%s\n", "OPEN_LIN_SLAVE_ERROR_INVALID_DATA_RX");
+            break;
+
+        case OPEN_LIN_SLAVE_ERROR_INVALID_CHECKSUM:
+            Serial.printf("\t%s\n", "OPEN_LIN_SLAVE_ERROR_INVALID_CHECKSUM");
+            break;
+
+        case OPEN_LIN_SLAVE_ERROR_PID_PARITY:
+            Serial.printf("\t%s\n", "OPEN_LIN_SLAVE_ERROR_PID_PARITY");
+            break;
+
+        case OPEN_LIN_SLAVE_ERROR_INVALID_SYNCH:
+            Serial.printf("\t%s\n", "OPEN_LIN_SLAVE_ERROR_INVALID_SYNCH");
+            break;
+
+        case OPEN_LIN_SLAVE_ERROR_INVALID_BREAK:
+            Serial.printf("\t%s\n", "OPEN_LIN_SLAVE_ERROR_INVALID_BREAK");
+            break;
+
+        case OPEN_LIN_SLAVE_ERROR_ID_NOT_FOUND:
+            Serial.printf("\t%s\n", "OPEN_LIN_SLAVE_ERROR_ID_NOT_FOUND");
+            break;
+
+        case OPEN_LIN_SLAVE_ERROR_HW_TX:
+            Serial.printf("\t%s\n", "OPEN_LIN_SLAVE_ERROR_HW_TX");
+            break;
+
+        case OPEN_LIN_MASTER_ERROR_CHECKSUM:
+            Serial.printf("\t%s\n", "OPEN_LIN_MASTER_ERROR_CHECKSUM");
+            break;
+
+        case OPEN_LIN_MASTER_ERROR_HEADER_TX:
+            Serial.printf("\t%s\n", "OPEN_LIN_MASTER_ERROR_HEADER_TX");
+            break;
+
+        case OPEN_LIN_MASTER_ERROR_DATA_TX:
+            Serial.printf("\t%s\n", "OPEN_LIN_MASTER_ERROR_DATA_TX");
+            break;
+
+        case OPEN_LIN_MASTER_ERROR_DATA_RX:
+            Serial.printf("\t%s\n", "OPEN_LIN_MASTER_ERROR_DATA_RX");
+            break;
+
+        case OPEN_LIN_MASTER_ERROR_DATA_RX_TIMEOUT:
+            Serial.printf("\t%s\n", "OPEN_LIN_MASTER_ERROR_DATA_RX_TIMEOUT");
+            break;
+        
+        default:
+            assert(0);
+    }
 }
 
 #ifdef __cplusplus
