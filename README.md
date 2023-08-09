@@ -50,16 +50,43 @@ In `examples/slave.cpp`, if `LIN_AUTOBAUD` is defined, autobaud is enabled, othe
 This project was tested with [Microchip LIN Serial Analyzer](https://www.microchip.com/en-us/development-tool/apgdt001) and [NXP TJA1021](https://www.nxp.com/docs/en/data-sheet/TJA1021.pdf) module.  
 (Sleep was not used in this test)
 
-## Setup for testing
-
-### Connection
+## Connection
 ![](https://github.com/CW-B-W/ESP32-openLIN/assets/76680670/a1ae1a09-027d-4a56-a39f-d6e7e818a5c4)
 
-### Code
-Use `examples/master.cpp` to do this test.
+## ESP32 as Master, LIN Analyzer as Slave
+
+### Setup
+1. Use `examples/master.cpp` to do this test.
+2. Open [LIN Serial Analyzer Debug Tool](https://www.microchip.com/en-us/software-library/lin_analyzer)
+3. Hold ESP32 reset button (Don't release now)
+4. Connect Debug Tool with `LIN Serial Analyzer`
+5. Choose to use Enhanced Checksum Type in Debug Tool
+6. Setup Slave Response in Debug Tool
+7. Select the responses and click `Add Slave Response Buffer`
+8. Release ESP32 reset button
+9. LIN frames should be detected and shown on the screen
 
 ### Result
-![](https://github.com/CW-B-W/ESP32-openLIN/assets/76680670/d6e20b59-a62b-4821-8e2b-e7bb25fb4ec7)
+<img width="75%" src="https://github.com/CW-B-W/ESP32-openLIN/assets/76680670/4d62c92f-fe68-4224-aa7c-221c1020bcaa"></img>
+
+Compared with the result in logic analyzer
+![](https://github.com/CW-B-W/ESP32-openLIN/assets/76680670/65f8c5ee-6844-4af9-b3d4-06d5ed067e57)
+
+## ESP32 as Slave, LIN Analyzer as Master
+
+### Setup
+1. Use `examples/slave.cpp` to do this test.
+2. Open [LIN Serial Analyzer Debug Tool](https://www.microchip.com/en-us/software-library/lin_analyzer)
+3. Hold ESP32 reset button (Don't release now)
+4. Connect Debug Tool with `LIN Serial Analyzer`
+5. Choose to use Enhanced Checksum Type in Debug Tool
+6. Setup Master frames in Debug Tool
+7. Select the two frames and click `Send Continuous`
+8. Release ESP32 reset button
+9. LIN frames should be detected and shown on the screen
+
+### Result
+<img width="75%" src="https://github.com/CW-B-W/ESP32-openLIN/assets/76680670/1d270cab-7424-4662-8f48-2380c32b4007"></img>
 
 Compared with the result in logic analyzer
 ![](https://github.com/CW-B-W/ESP32-openLIN/assets/76680670/65f8c5ee-6844-4af9-b3d4-06d5ed067e57)
