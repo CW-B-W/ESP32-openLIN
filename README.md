@@ -56,23 +56,10 @@ This project was tested with [Microchip LIN Serial Analyzer](https://www.microch
 ![](https://github.com/CW-B-W/ESP32-openLIN/assets/76680670/a1ae1a09-027d-4a56-a39f-d6e7e818a5c4)
 
 ### Code
-
-`examples/master.cpp` is used for the test, but the original `examples/master.cpp` has a frame to receive from LIN slave, and it causes LIN Serial Analyzer to consider it errors.  
-Therefore the 2nd frame is disabled, like the following code snippet.
-```C++
-    uint8_t master_data_buffer[][8] = {
-        {'h', 'e', 'l', 'l', 'o'},
-        // {0, 0, 0, 0, 0}
-    };
-    t_master_frame_table_item master_frame_table[] = {
-            {10, 0, {0x02, OPEN_LIN_FRAME_TYPE_TRANSMIT, frame_data_length[0], master_data_buffer[0]}},
-            // {10, 0, {0x03, OPEN_LIN_FRAME_TYPE_RECEIVE,  frame_data_length[1], master_data_buffer[1]}}
-    };
-```
-
+Use `examples/master.cpp` to do this test.
 
 ### Result
-![](https://github.com/CW-B-W/ESP32-openLIN/assets/76680670/9e6c0d34-3de1-4832-a106-8b6804a0f513)
+![](https://github.com/CW-B-W/ESP32-openLIN/assets/76680670/d6e20b59-a62b-4821-8e2b-e7bb25fb4ec7)
 
 Compared with the result in logic analyzer
 ![](https://github.com/CW-B-W/ESP32-openLIN/assets/76680670/65f8c5ee-6844-4af9-b3d4-06d5ed067e57)
