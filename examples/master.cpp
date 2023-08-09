@@ -18,7 +18,8 @@ void open_lin_master_state_callback(t_open_lin_master_state new_state)
     master_state_prev = master_state;
     master_state = new_state;
     if (new_state == OPEN_LIN_MASTER_IDLE) {
-        swLin.flush(); // to ensure every bytes are sent.
+        // DO NOT use swLin.flush()
+        // swLin.flush() is for flushing Rx buffer
         swLin.endFrame();
     }
 

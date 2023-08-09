@@ -20,7 +20,8 @@ void open_lin_slave_state_callback(t_open_lin_slave_state new_state)
     slave_state_prev = slave_state;
     slave_state = new_state;
     if (new_state == OPEN_LIN_SLAVE_IDLE) {
-        swLin.flush(); // to ensure every bytes are sent.
+        // DO NOT use swLin.flush()
+        // swLin.flush() is for flushing Rx buffer
         swLin.endFrame();
     }
     
