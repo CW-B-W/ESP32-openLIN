@@ -77,13 +77,11 @@ Compared with the result in logic analyzer
 ### Setup
 1. Use `examples/slave.cpp` to do this test.
 2. Open [LIN Serial Analyzer Debug Tool](https://www.microchip.com/en-us/software-library/lin_analyzer)
-3. Hold ESP32 reset button (Don't release now)
-4. Connect Debug Tool with `LIN Serial Analyzer`
-5. Choose to use Enhanced Checksum Type in Debug Tool
-6. Setup Master frames in Debug Tool
-7. Select the two frames and click `Send Continuous`
-8. Release ESP32 reset button
-9. LIN frames should be detected and shown on the screen
+3. Connect Debug Tool with `LIN Serial Analyzer`
+4. Choose to use Enhanced Checksum Type in Debug Tool
+5. Setup Master frames in Debug Tool
+6. Select the two frames and click `Send Continuous`
+7. LIN frames should be detected and shown on the screen
 
 ### Result
 <img width="75%" src="https://github.com/CW-B-W/ESP32-openLIN/assets/76680670/1d270cab-7424-4662-8f48-2380c32b4007"></img>
