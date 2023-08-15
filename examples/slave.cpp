@@ -41,7 +41,7 @@ extern "C" void app_main()
     const uint32_t LIN_BAUD_MAX = 20000;
     swLin.begin(LIN_BAUD_MAX);
 #else
-    swLin.begin(9600);
+    swLin.begin(19200);
 #endif
 
     l_u8 frame_data_length[] = {

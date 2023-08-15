@@ -23,24 +23,25 @@ void open_lin_master_state_callback(t_open_lin_master_state new_state)
         // DO NOT use swLin.flush()
         // swLin.flush() is for flushing Rx buffer
         swLin.endFrame();
-
-        uint32_t delay_us = frame_slot_time_us - open_lin_master_dl_get_frame_slot_time_passed_us();
-        uint32_t start_micros = micros();
-        while (delay_us < (micros() - start_micros))
-        {
-            ; // Wait until the frame slot time finished
-        }
     }
 
     if (master_state != master_state_prev && master_state == OPEN_LIN_MASTER_IDLE) {
         // transitted to IDLE state
+        
+        int32_t delay_us = frame_slot_time_us - (micros() - open_lin_master_dl_get_frame_start_time_us());
+        // it's possible `delay_us < 0`
+        uint32_t start_micros = micros();
+        while (delay_us > 0 && delay_us > (micros() - start_micros))
+        {
+            ; // Wait until the frame slot time is consumed
+        }
     }
 }
 
 extern "C" void app_main()
 {
     Serial.begin(115200);
-    swLin.begin(9600);
+    swLin.begin(19200);
 
     l_u8 frame_data_length[] = {
         1,
@@ -62,22 +63,8 @@ extern "C" void app_main()
     open_lin_master_dl_init(master_frame_table, table_size);
     open_lin_master_dl_set_state_callback(open_lin_master_state_callback);
     
-    unsigned long micros_prev = micros();
-    unsigned long micros_now = micros();
     while (1) {
-        if (master_state == OPEN_LIN_MASTER_DATA_RX) {
-            uint8_t buf[8];
-            
-            int bytes_read = swLin.read(buf, sizeof(buf));
-
-            for (int i = 0; i < bytes_read; ++i) {
-                open_lin_master_dl_rx(buf[i]);
-            }
-        }
-
-        micros_now = micros();
-        open_lin_master_dl_handler(micros_now - micros_prev);
-        micros_prev = micros_now;
+        open_lin_master_dl_handler();
     }
 }
 
