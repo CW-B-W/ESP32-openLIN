@@ -1,4 +1,8 @@
 .pio/
+.vscode/
+dependencies.lock
+sdkconfig.*
+!sdkconfig.defaults
 
 # Prerequisites
 *.d
