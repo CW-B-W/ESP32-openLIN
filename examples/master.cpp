@@ -9,7 +9,7 @@ extern "C" {
 
 SoftwareLin swLin(RX_PIN, TX_PIN);
 
-const uint32_t frame_slot_time_us = 10000;
+const uint32_t frame_slot_time_us = 300000;
 
 volatile t_open_lin_master_state master_state_prev = OPEN_LIN_MASTER_IDLE;
 volatile t_open_lin_master_state master_state = OPEN_LIN_MASTER_IDLE;
@@ -40,7 +40,7 @@ void open_lin_master_state_callback(t_open_lin_master_state new_state)
 extern "C" void app_main()
 {
     Serial.begin(115200);
-    swLin.begin(19200);
+    swLin.begin(9600);
 
     l_u8 frame_data_length[] = {
         1,

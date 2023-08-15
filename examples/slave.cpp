@@ -34,14 +34,14 @@ extern "C" void app_main()
 {
     Serial.begin(115200);
 
-#define LIN_AUTOBAUD
+// #define LIN_AUTOBAUD
 
 #ifdef LIN_AUTOBAUD
     const uint32_t command_baud[] = {1200, 2400, 4800, 9600, 14400, 19200};
     const uint32_t LIN_BAUD_MAX = 20000;
     swLin.begin(LIN_BAUD_MAX);
 #else
-    swLin.begin(19200);
+    swLin.begin(9600);
 #endif
 
     l_u8 frame_data_length[] = {
@@ -85,30 +85,26 @@ extern "C" void app_main()
                 Serial.printf("autobaud detection failed. baud is not changed = %u\n\n", swLin.baudRate());
                 open_lin_slave_rx_header(0x00); // setAutoBaud() failed to recognize SYNC. 0x00 is not expected, thus the slave is reset.
             }
-            
-            uint8_t buf[2 + 8]; // 2 for PID, CHECKSUM. SYNC is consumed by swLin.setAutoBaud()
 #else
-            uint8_t buf[3 + 8]; // 3 for SYNC, PID and CHECKSUM.
+            
 #endif
 
+            const unsigned long read_timeout_us = 300000 - 500;
+            unsigned long start_micro = micros();
             while (slave_state != OPEN_LIN_SLAVE_IDLE) {
-                const unsigned long timeout_us = 100000; // 100ms timeout
-                unsigned long start_micro = micros();
-                while (swLin.available() <= 0 && (micros() - start_micro) < timeout_us)
+                while (swLin.available() <= 0 && (micros() - start_micro) < read_timeout_us)
                     ;
-                int bytes_read = swLin.read(buf, sizeof(buf));
-
-                for (int i = 0; i < bytes_read; ++i) {
-                    open_lin_slave_rx_header(buf[i]);
-                }
+                uint8_t val = 0;
+                int bytes_read = swLin.read(&val, 1);
 
                 if (bytes_read <= 0) {
                     open_lin_slave_reset();
                     Serial.printf("Slave read timeout, resetting slave\n");
+                    break;
                 }
-            }
 
-            delay(10);
+                open_lin_slave_rx_header(val);
+            }
         }
     }
 }
@@ -128,7 +124,7 @@ void open_lin_on_rx_frame(open_lin_frame_slot_t *slot)
 
 void open_lin_on_tx_frame(open_lin_frame_slot_t *slot)
 {
-    Serial.printf("[open_lin_on_rx_frame] PID=%d\n\t", (int)slot->pid);
+    Serial.printf("[open_lin_on_tx_frame] PID=%d\n\n", (int)slot->pid);
     slot->data_ptr[0]++;
 }
 
