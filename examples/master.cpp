@@ -31,50 +31,44 @@ void open_lin_master_state_callback(t_open_lin_master_state new_state)
 extern "C" void app_main()
 {
     Serial.begin(115200);
-    swLin.begin(9600);
+    swLin.begin(19200);
 
     l_u8 frame_data_length[] = {
-        5,
-        5
+        1,
+        1,
+        8
     };
 
     uint8_t master_data_buffer[][8] = {
-        {'h', 'e', 'l', 'l', 'o'},
-        {0, 0, 0, 0, 0}
+        {0x00},
+        {'X'},
+        {'h', 'e', 'l', 'l', 'o', 'y', 'o', 'u'}
     };
     t_master_frame_table_item master_frame_table[] = {
-            {10, 0, {0x02, OPEN_LIN_FRAME_TYPE_TRANSMIT, frame_data_length[0], master_data_buffer[0]}},
-            {10, 0, {0x03, OPEN_LIN_FRAME_TYPE_RECEIVE,  frame_data_length[1], master_data_buffer[1]}}
+        {10000, {0x01, OPEN_LIN_FRAME_TYPE_RECEIVE,   frame_data_length[0], master_data_buffer[0]}},
+        {10000, {0x02, OPEN_LIN_FRAME_TYPE_TRANSMIT,  frame_data_length[1], master_data_buffer[1]}},
+        {10000, {0x03, OPEN_LIN_FRAME_TYPE_TRANSMIT,  frame_data_length[2], master_data_buffer[2]}}
     };
     l_u8 table_size = sizeof(master_frame_table) / sizeof(master_frame_table[0]);
     open_lin_master_dl_init(master_frame_table, table_size);
     open_lin_master_dl_set_state_callback(open_lin_master_state_callback);
     
-    unsigned long micro_prev = micros();
+    unsigned long micros_prev = micros();
+    unsigned long micros_now = micros();
     while (1) {
-        unsigned long micro_now = micros();
-
         if (master_state == OPEN_LIN_MASTER_DATA_RX) {
             uint8_t buf[8];
             
-            const unsigned long timeout_us = 100000; // 100ms timeout
-            unsigned long start_micro = micros();
-            while (swLin.available() <= 0 && (micros() - start_micro) < timeout_us) // 100ms timeout
-                ;
             int bytes_read = swLin.read(buf, sizeof(buf));
 
             for (int i = 0; i < bytes_read; ++i) {
                 open_lin_master_dl_rx(buf[i]);
             }
-
-            if (bytes_read <= 0) {
-                Serial.printf("Master read timeout\n");
-            }
         }
 
-        open_lin_master_dl_handler((micro_now - micro_prev)/1000);
-        micro_prev = micro_now;
-        delay(1);
+        micros_now = micros();
+        open_lin_master_dl_handler(micros_now - micros_prev);
+        micros_prev = micros();
     }
 }
 
@@ -144,8 +138,8 @@ void open_lin_error_handler(t_open_lin_error error_code)
             Serial.printf("\t%s\n", "OPEN_LIN_MASTER_ERROR_DATA_RX");
             break;
 
-        case OPEN_LIN_MASTER_ERROR_DATA_RX_TIMEOUT:
-            Serial.printf("\t%s\n", "OPEN_LIN_MASTER_ERROR_DATA_RX_TIMEOUT");
+        case OPEN_LIN_MASTER_ERROR_FRAMESLOT_TIMEOUT:
+            Serial.printf("\t%s\n", "OPEN_LIN_MASTER_ERROR_FRAMESLOT_TIMEOUT");
             break;
         
         default:

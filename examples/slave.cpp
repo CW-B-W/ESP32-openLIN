@@ -41,21 +41,24 @@ extern "C" void app_main()
     const uint32_t LIN_BAUD_MAX = 20000;
     swLin.begin(LIN_BAUD_MAX);
 #else
-    swLin.begin(9600);
+    swLin.begin(19200);
 #endif
 
     l_u8 frame_data_length[] = {
-        5,
-        5
+        1,
+        1,
+        8
     };
 
     uint8_t slave_data_buffer[][8] = {
-        {0, 0, 0, 0, 0},
-        {'S', 'L', 'A', 'V', 'E'}
+        {'X'},
+        {0x00},
+        {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
     };
     open_lin_frame_slot_t frame_slot[] = {
-        {0x02, OPEN_LIN_FRAME_TYPE_RECEIVE,  frame_data_length[0], slave_data_buffer[0]},
-        {0x03, OPEN_LIN_FRAME_TYPE_TRANSMIT, frame_data_length[1], slave_data_buffer[1]}
+        {0x01, OPEN_LIN_FRAME_TYPE_TRANSMIT,  frame_data_length[0], slave_data_buffer[0]},
+        {0x02, OPEN_LIN_FRAME_TYPE_RECEIVE,   frame_data_length[1], slave_data_buffer[1]},
+        {0x03, OPEN_LIN_FRAME_TYPE_RECEIVE,   frame_data_length[2], slave_data_buffer[2]}
     };
     l_u8 slot_size = sizeof(frame_slot) / sizeof(frame_slot[0]);
     open_lin_net_init(frame_slot, slot_size);
@@ -123,6 +126,12 @@ void open_lin_on_rx_frame(open_lin_frame_slot_t *slot)
     Serial.printf("\n\n");
 }
 
+void open_lin_on_tx_frame(open_lin_frame_slot_t *slot)
+{
+    Serial.printf("[open_lin_on_rx_frame] PID=%d\n\t", (int)slot->pid);
+    slot->data_ptr[0]++;
+}
+
 void open_lin_error_handler(t_open_lin_error error_code)
 {
     Serial.printf("[open_lin_error_handler] error_code = %d\n", (int)error_code);
@@ -176,8 +185,8 @@ void open_lin_error_handler(t_open_lin_error error_code)
             Serial.printf("\t%s\n", "OPEN_LIN_MASTER_ERROR_DATA_RX");
             break;
 
-        case OPEN_LIN_MASTER_ERROR_DATA_RX_TIMEOUT:
-            Serial.printf("\t%s\n", "OPEN_LIN_MASTER_ERROR_DATA_RX_TIMEOUT");
+        case OPEN_LIN_MASTER_ERROR_FRAMESLOT_TIMEOUT:
+            Serial.printf("\t%s\n", "OPEN_LIN_MASTER_ERROR_FRAMESLOT_TIMEOUT");
             break;
         
         default:
