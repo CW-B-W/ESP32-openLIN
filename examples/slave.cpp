@@ -185,8 +185,8 @@ void open_lin_error_handler(t_open_lin_error error_code)
             Serial.printf("\t%s\n", "OPEN_LIN_MASTER_ERROR_DATA_RX");
             break;
 
-        case OPEN_LIN_MASTER_ERROR_FRAMESLOT_TIMEOUT:
-            Serial.printf("\t%s\n", "OPEN_LIN_MASTER_ERROR_FRAMESLOT_TIMEOUT");
+        case OPEN_LIN_MASTER_ERROR_FRAME_SLOT_TIMEOUT:
+            Serial.printf("\t%s\n", "OPEN_LIN_MASTER_ERROR_FRAME_SLOT_TIMEOUT");
             break;
         
         default:

@@ -9,6 +9,8 @@ extern "C" {
 
 SoftwareLin swLin(RX_PIN, TX_PIN);
 
+const uint32_t frame_slot_time_us = 10000;
+
 volatile t_open_lin_master_state master_state_prev = OPEN_LIN_MASTER_IDLE;
 volatile t_open_lin_master_state master_state = OPEN_LIN_MASTER_IDLE;
 void open_lin_master_state_callback(t_open_lin_master_state new_state)
@@ -21,6 +23,13 @@ void open_lin_master_state_callback(t_open_lin_master_state new_state)
         // DO NOT use swLin.flush()
         // swLin.flush() is for flushing Rx buffer
         swLin.endFrame();
+
+        uint32_t delay_us = frame_slot_time_us - open_lin_master_dl_get_frame_slot_time_passed_us();
+        uint32_t start_micros = micros();
+        while (delay_us < (micros() - start_micros))
+        {
+            ; // Wait until the frame slot time finished
+        }
     }
 
     if (master_state != master_state_prev && master_state == OPEN_LIN_MASTER_IDLE) {
@@ -45,9 +54,9 @@ extern "C" void app_main()
         {'h', 'e', 'l', 'l', 'o', 'y', 'o', 'u'}
     };
     t_master_frame_table_item master_frame_table[] = {
-        {10000, {0x01, OPEN_LIN_FRAME_TYPE_RECEIVE,   frame_data_length[0], master_data_buffer[0]}},
-        {10000, {0x02, OPEN_LIN_FRAME_TYPE_TRANSMIT,  frame_data_length[1], master_data_buffer[1]}},
-        {10000, {0x03, OPEN_LIN_FRAME_TYPE_TRANSMIT,  frame_data_length[2], master_data_buffer[2]}}
+        {frame_slot_time_us, {0x01, OPEN_LIN_FRAME_TYPE_RECEIVE,   frame_data_length[0], master_data_buffer[0]}},
+        {frame_slot_time_us, {0x02, OPEN_LIN_FRAME_TYPE_TRANSMIT,  frame_data_length[1], master_data_buffer[1]}},
+        {frame_slot_time_us, {0x03, OPEN_LIN_FRAME_TYPE_TRANSMIT,  frame_data_length[2], master_data_buffer[2]}}
     };
     l_u8 table_size = sizeof(master_frame_table) / sizeof(master_frame_table[0]);
     open_lin_master_dl_init(master_frame_table, table_size);
@@ -68,7 +77,7 @@ extern "C" void app_main()
 
         micros_now = micros();
         open_lin_master_dl_handler(micros_now - micros_prev);
-        micros_prev = micros();
+        micros_prev = micros_now;
     }
 }
 
@@ -138,8 +147,8 @@ void open_lin_error_handler(t_open_lin_error error_code)
             Serial.printf("\t%s\n", "OPEN_LIN_MASTER_ERROR_DATA_RX");
             break;
 
-        case OPEN_LIN_MASTER_ERROR_FRAMESLOT_TIMEOUT:
-            Serial.printf("\t%s\n", "OPEN_LIN_MASTER_ERROR_FRAMESLOT_TIMEOUT");
+        case OPEN_LIN_MASTER_ERROR_FRAME_SLOT_TIMEOUT:
+            Serial.printf("\t%s\n", "OPEN_LIN_MASTER_ERROR_FRAME_SLOT_TIMEOUT");
             break;
         
         default:
