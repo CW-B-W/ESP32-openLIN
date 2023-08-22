@@ -65,9 +65,23 @@ l_u8 open_lin_hw_rx_data(l_u8 *data, l_u8 len, l_u32 timeout_us)
     return bytes_read;
 }
 
+static l_bool rx_enabled = l_false;
 void open_lin_set_rx_enabled(l_bool status)
 {
+    if (rx_enabled == status) {
+        return;
+    }
 
+    if (status == l_true) {
+        swLin.flush(); // flush Rx buffer
+        swLin.enableRx(true);
+        rx_enabled = l_true;
+    }
+    else {
+        swLin.enableRx(false);
+        swLin.flush(); // flush Rx buffer
+        rx_enabled = l_false;
+    }
 }
 
 #ifdef __cplusplus
