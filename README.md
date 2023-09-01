@@ -46,7 +46,7 @@ In `examples/slave.cpp`, function `open_lin_error_handler` is used to handle the
 ## Enable/Disable autobaud for LIN slave
 In `examples/slave.cpp`, if `LIN_AUTOBAUD` is defined, autobaud is enabled, otherwise autobaud is disabled. Refer to https://github.com/CW-B-W/ESP32-openLIN/blob/677470aaf2609fb12ef86f3ba0c760aa747735f0/examples/slave.cpp#L35
 
-# Testing
+# Testing - Microchip LIN Serial Analyzer
 This project was tested with [Microchip LIN Serial Analyzer](https://www.microchip.com/en-us/development-tool/apgdt001) and [NXP TJA1021](https://www.nxp.com/docs/en/data-sheet/TJA1021.pdf) module.  
 (Sleep was not used in this test)
 
@@ -88,3 +88,7 @@ Compared with the result in logic analyzer
 
 Compared with the result in logic analyzer
 ![](https://github.com/CW-B-W/ESP32-openLIN/assets/76680670/65f8c5ee-6844-4af9-b3d4-06d5ed067e57)
+
+# Testing - Vector VN1611
+This project was also tested with VN1611.  
+We can take advantages of [Vector XL Driver Library](https://www.vector.com/int/en/products/products-a-z/libraries-drivers/xl-driver-library/) to test it with VN1611.
