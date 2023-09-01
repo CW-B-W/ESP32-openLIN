@@ -68,6 +68,8 @@ extern "C" void app_main()
 
     while (1) {
         if (swLin.checkBreak()) {
+            // sw_lin.checkBreak() blocks until UART ISR gives the semaphore
+
             // In `open_lin_slave_rx_header` it checks for break,
             // but the swLin.checkBreak() has done the check.
             // Therefore `open_lin_hw_break_reg` is reg to notify
